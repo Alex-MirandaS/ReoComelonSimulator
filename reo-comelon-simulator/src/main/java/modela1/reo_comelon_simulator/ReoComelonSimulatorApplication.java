@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ReoComelonSimulatorApplication {
 
 	public static void main(String[] args) {
-		//SpringApplication.run(ReoComelonSimulatorApplication.class, args);
-		System.out.println("HOLA MUNDO");
+		SpringApplication.run(ReoComelonSimulatorApplication.class, args);
+		//System.out.println("HOLA MUNDO");
 	}
 
 }
