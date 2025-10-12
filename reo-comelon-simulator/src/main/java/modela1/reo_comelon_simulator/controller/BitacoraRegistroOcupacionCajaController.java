@@ -31,6 +31,13 @@ public class BitacoraRegistroOcupacionCajaController implements BitacoraRegistro
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getBitacoraRegistroOcupacionCajaByIdOcupacionCaja(Integer id) {
+        log.info("GET /bitacoraRegistroOcupacionCaja/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = bitacoraRegistroOcupacionCajaService.getBitacoraRegistroOcupacionCajaByIdOcupacionCaja(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> deleteBitacoraRegistroOcupacionCaja(Integer id) {
         log.info("DELETE /bitacoraRegistroOcupacionCaja/{id}");
         ResponseSuccessfullyDto responseSuccessfullyDto = bitacoraRegistroOcupacionCajaService.deleteBitacoraRegistroOcupacionCaja(id);

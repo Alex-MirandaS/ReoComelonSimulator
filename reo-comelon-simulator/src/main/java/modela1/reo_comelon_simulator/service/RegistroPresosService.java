@@ -31,6 +31,14 @@ public class RegistroPresosService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+    public ResponseSuccessfullyDto getRegistroPresosByIdTipoPreso(Integer id) {
+        List<RegistroPresos> list = registro_presosCrud.getRegistroPresosByIdTipoPreso(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
     public ResponseSuccessfullyDto getRegistroPresosById(Integer id) {
         Optional<RegistroPresos> optional = registro_presosCrud.findById(id);
         if (optional.isEmpty()) {

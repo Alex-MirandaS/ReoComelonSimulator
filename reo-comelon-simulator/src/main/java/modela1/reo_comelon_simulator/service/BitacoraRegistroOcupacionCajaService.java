@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import modela1.reo_comelon_simulator.dto.response.ResponseSuccessfullyDto;
-import modela1.reo_comelon_simulator.dto.response.BitacoraRegistroOcupacionCajaDto;
 import modela1.reo_comelon_simulator.repository.entities.BitacoraRegistroOcupacionCaja;
 import modela1.reo_comelon_simulator.repository.crud.BitacoraRegistroOcupacionCajaCrud;
 
@@ -21,6 +20,14 @@ public class BitacoraRegistroOcupacionCajaService {
 
     public ResponseSuccessfullyDto getAllBitacoraRegistroOcupacionCaja() {
         List<BitacoraRegistroOcupacionCaja> list = bitacora_registro_ocupacion_cajaCrud.findAll();
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
+    public ResponseSuccessfullyDto getBitacoraRegistroOcupacionCajaByIdOcupacionCaja(Integer id) {
+        List<BitacoraRegistroOcupacionCaja> list = bitacora_registro_ocupacion_cajaCrud.getBitacoraRegistroOcupacionCajaByIdOcupacionCaja(id);
         if (list.isEmpty()) {
             throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
         }

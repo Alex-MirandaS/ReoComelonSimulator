@@ -17,6 +17,9 @@ public interface SimulacionMenusApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getSimulacionMenusById(@PathVariable Integer id);
 
+    @GetMapping("/simulacion/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getSimulacionMenuByIdSimulacion(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateSimulacionMenus(@RequestBody SimulacionMenusDto simulacionMenusDto);
 

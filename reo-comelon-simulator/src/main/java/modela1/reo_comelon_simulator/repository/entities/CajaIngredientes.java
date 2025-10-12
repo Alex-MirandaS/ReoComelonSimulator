@@ -14,14 +14,14 @@ public class CajaIngredientes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_ocupacion_caja", referencedColumnName = "id")
     private OcupacionCaja ocupacionCaja;
 
     private Integer cantidad;
     private Double precio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_ingrediente", referencedColumnName = "id")
     private Ingrediente ingrediente;
 }

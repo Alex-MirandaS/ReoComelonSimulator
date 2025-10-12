@@ -39,6 +39,20 @@ public class CajaIngredientesController implements CajaIngredientesApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getCajaIngredByIdIngrediente(Integer id) {
+        log.info("GET /cajaIngredientes/ingrediente/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = cajaIngredientesService.getCajaIngredByIdIngrediente(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getCajaIngredByIdOcupacionCaja(Integer id) {
+        log.info("GET /cajaIngredientes/ocupacionCaja/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = cajaIngredientesService.getCajaIngredByIdOcupacionCaja(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateCajaIngredientes(CajaIngredientesDto cajaIngredientesDto) {
         log.info("PUT /cajaIngredientes");
         ResponseSuccessfullyDto responseSuccessfullyDto = cajaIngredientesService.updateCajaIngredientes(cajaIngredientesDto);

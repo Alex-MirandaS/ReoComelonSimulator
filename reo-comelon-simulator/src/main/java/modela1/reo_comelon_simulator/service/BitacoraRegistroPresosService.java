@@ -27,6 +27,14 @@ public class BitacoraRegistroPresosService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+    public ResponseSuccessfullyDto getBitacoraRegistroPresosByIdRegistroPresos(Integer id) {
+        List<BitacoraRegistroPresos> list = bitacora_registro_presosCrud.getBitacoraRegistroPresosByIdRegistroPresos(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
     public ResponseSuccessfullyDto getBitacoraRegistroPresosById(Integer id) {
         Optional<BitacoraRegistroPresos> optional = bitacora_registro_presosCrud.findById(id);
         if (optional.isEmpty()) {

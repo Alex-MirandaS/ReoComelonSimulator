@@ -17,9 +17,13 @@ public interface RegistroPresosApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getRegistroPresosById(@PathVariable Integer id);
 
+    @GetMapping("/tipoPreso/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getRegistroPresosByIdTipoPreso(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateRegistroPresos(@RequestBody RegistroPresosDto registroPresosDto);
 
     @DeleteMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> deleteRegistroPresos(@PathVariable Integer id);
+
 }

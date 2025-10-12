@@ -39,6 +39,13 @@ public class DetalleMenuController implements DetalleMenuApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDetalleMenuByIdMenu(Integer id) {
+        log.info("GET /detalleMenu/menu/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = detalleMenuService.getDetalleMenuByIdMenu(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateDetalleMenu(DetalleMenuDto detalleMenuDto) {
         log.info("PUT /detalleMenu");
         ResponseSuccessfullyDto responseSuccessfullyDto = detalleMenuService.updateDetalleMenu(detalleMenuDto);

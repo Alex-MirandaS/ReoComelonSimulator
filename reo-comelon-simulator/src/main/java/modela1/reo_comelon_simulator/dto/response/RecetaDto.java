@@ -15,4 +15,6 @@ public class RecetaDto {
 
     private Boolean es_premium;
 
+    private String nombre;
+
 }

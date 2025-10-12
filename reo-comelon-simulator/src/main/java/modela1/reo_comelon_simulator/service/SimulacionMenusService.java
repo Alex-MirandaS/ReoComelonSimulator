@@ -38,6 +38,14 @@ public class SimulacionMenusService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional.get()).build();
     }
 
+    public ResponseSuccessfullyDto getSimulacionMenuByIdSimulacion(Integer id) {
+        List<SimulacionMenus> list = simulacion_menusCrud.getSimulacionMenuByIdSimulacion(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
     public ResponseSuccessfullyDto deleteSimulacionMenus(Integer id) {
         Optional<SimulacionMenus> optional = simulacion_menusCrud.findById(id);
         if (optional.isEmpty()) {

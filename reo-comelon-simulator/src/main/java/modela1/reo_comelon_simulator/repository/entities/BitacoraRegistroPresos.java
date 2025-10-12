@@ -17,7 +17,7 @@ public class BitacoraRegistroPresos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_registro_presos", referencedColumnName = "id")
     private RegistroPresos registroPresos;
 

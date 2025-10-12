@@ -28,6 +28,7 @@ public class RecetaIngredienteService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+
     public ResponseSuccessfullyDto getRecetaIngredienteById(Integer id) {
         Optional<RecetaIngrediente> optional = receta_ingredienteCrud.findById(id);
         if (optional.isEmpty()) {
@@ -36,6 +37,13 @@ public class RecetaIngredienteService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional.get()).build();
     }
 
+    public ResponseSuccessfullyDto getRecetaIngredByIdReceta(Integer id) {
+        List<RecetaIngrediente> list = receta_ingredienteCrud.getRecetaIngredByIdReceta(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
     public ResponseSuccessfullyDto deleteRecetaIngrediente(Integer id) {
         Optional<RecetaIngrediente> optional = receta_ingredienteCrud.findById(id);
         if (optional.isEmpty()) {

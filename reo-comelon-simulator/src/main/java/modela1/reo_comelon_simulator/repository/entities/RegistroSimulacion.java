@@ -23,11 +23,11 @@ public class RegistroSimulacion {
     private Double presupuesto;
     private Double perdida;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_registro_presos", referencedColumnName = "id")
     private RegistroPresos registroPresos;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_bodega", referencedColumnName = "id")
     private RegistroBodega registroBodega;
 }

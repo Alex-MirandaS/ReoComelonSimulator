@@ -14,11 +14,11 @@ public class RecetaIngrediente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_receta", referencedColumnName = "id")
     private Receta receta;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_ingrediente", referencedColumnName = "id")
     private Ingrediente ingrediente;
 

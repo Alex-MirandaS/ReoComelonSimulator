@@ -14,7 +14,7 @@ public class RegistroPresos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_preso", referencedColumnName = "id")
 
     private TipoPreso tipoPreso;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import modela1.reo_comelon_simulator.dto.request.NewDetalleMenuDto;
 import modela1.reo_comelon_simulator.exception.BusinessException;
+import modela1.reo_comelon_simulator.repository.entities.Menu;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -98,6 +99,14 @@ public class DetalleMenuService {
         } catch (Exception e) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al eliminar el registro");
         }
+    }
+
+    public ResponseSuccessfullyDto getDetalleMenuByIdMenu(Integer id) {
+        List<DetalleMenu> list = detalle_menuCrud.getDetalleMenuByIdMenu(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
 }

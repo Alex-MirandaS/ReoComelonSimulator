@@ -39,6 +39,13 @@ public class SimulacionMenusController implements SimulacionMenusApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getSimulacionMenuByIdSimulacion(Integer id) {
+        log.info("GET /simulacionMenus/simulacion/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = simulacionMenusService.getSimulacionMenuByIdSimulacion(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateSimulacionMenus(SimulacionMenusDto simulacionMenusDto) {
         log.info("PUT /simulacionMenus");
         ResponseSuccessfullyDto responseSuccessfullyDto = simulacionMenusService.updateSimulacionMenus(simulacionMenusDto);

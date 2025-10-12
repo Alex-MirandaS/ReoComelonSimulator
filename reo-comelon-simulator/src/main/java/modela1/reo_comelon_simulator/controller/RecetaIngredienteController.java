@@ -39,6 +39,13 @@ public class RecetaIngredienteController implements RecetaIngredienteApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getRecetaIngredByIdReceta(Integer id) {
+        log.info("GET /recetaIngrediente/receta/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = recetaIngredienteService.getRecetaIngredByIdReceta(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateRecetaIngrediente(RecetaIngredienteDto recetaIngredienteDto) {
         log.info("PUT /recetaIngrediente");
         ResponseSuccessfullyDto responseSuccessfullyDto = recetaIngredienteService.updateRecetaIngrediente(recetaIngredienteDto);

@@ -17,6 +17,9 @@ public interface RecetaIngredienteApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getRecetaIngredienteById(@PathVariable Integer id);
 
+    @GetMapping("/receta/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getRecetaIngredByIdReceta(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateRecetaIngrediente(@RequestBody RecetaIngredienteDto recetaIngredienteDto);
 

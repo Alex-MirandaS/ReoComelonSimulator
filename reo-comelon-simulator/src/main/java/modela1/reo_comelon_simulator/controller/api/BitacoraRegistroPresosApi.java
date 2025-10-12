@@ -13,6 +13,9 @@ public interface BitacoraRegistroPresosApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getBitacoraRegistroPresosById(@PathVariable Integer id);
 
+    @GetMapping("/registroPresos/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getBitacoraRegistroPresosByIdRegistroPresos(@PathVariable Integer id);
+
     @DeleteMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> deleteBitacoraRegistroPresos(@PathVariable Integer id);
 }

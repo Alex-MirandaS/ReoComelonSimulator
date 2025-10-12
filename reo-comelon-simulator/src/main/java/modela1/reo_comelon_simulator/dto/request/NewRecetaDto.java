@@ -11,6 +11,8 @@ public class NewRecetaDto {
 
     private Integer id_Tipo_Receta;
 
+    private String nombre;
+
     private Boolean es_premium;
 
 }

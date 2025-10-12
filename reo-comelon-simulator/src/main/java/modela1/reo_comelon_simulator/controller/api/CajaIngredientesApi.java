@@ -17,6 +17,12 @@ public interface CajaIngredientesApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getCajaIngredientesById(@PathVariable Integer id);
 
+    @GetMapping("/ingrediente/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getCajaIngredByIdIngrediente(@PathVariable Integer id);
+
+    @GetMapping("/ocupacionCaja/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getCajaIngredByIdOcupacionCaja(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateCajaIngredientes(@RequestBody CajaIngredientesDto cajaIngredientesDto);
 

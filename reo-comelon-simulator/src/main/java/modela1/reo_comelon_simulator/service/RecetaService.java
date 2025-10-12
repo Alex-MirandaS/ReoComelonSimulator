@@ -39,6 +39,22 @@ public class RecetaService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional.get()).build();
     }
 
+    public ResponseSuccessfullyDto getRecetaByIdTipoReceta(Integer id) {
+        List<Receta> optional = recetaCrud.getRecetaByIdTipoReceta(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional).build();
+    }
+
+    public ResponseSuccessfullyDto getRecetaByEsPremiun(Boolean id) {
+        List<Receta> optional = recetaCrud.getRecetaByIdesPremiun(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional).build();
+    }
+
     public ResponseSuccessfullyDto deleteReceta(Integer id) {
         Optional<Receta> optional = recetaCrud.findById(id);
         if (optional.isEmpty()) {
@@ -56,6 +72,7 @@ public class RecetaService {
         Receta receta = new Receta();
         receta.setTipoReceta(tipoRecetaService.getTipoRecetaByIdTipoReceta(newRecetaDto.getId_Tipo_Receta()));
         receta.setEs_premium(newRecetaDto.getEs_premium());
+        receta.setNombre(newRecetaDto.getNombre());
 
         try{
             recetaCrud.save(receta);
@@ -75,6 +92,7 @@ public class RecetaService {
         Receta receta = new Receta();
         receta.setTipoReceta(tipoRecetaService.getTipoRecetaByIdTipoReceta(recetaDto.getId_Tipo_Receta()));
         receta.setEs_premium(recetaDto.getEs_premium());
+        receta.setNombre(recetaDto.getNombre());
 
         try{
             recetaCrud.save(receta);

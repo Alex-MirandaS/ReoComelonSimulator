@@ -39,6 +39,13 @@ public class RegistroPresosController implements RegistroPresosApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getRegistroPresosByIdTipoPreso(Integer id) {
+        log.info("GET /registroPresos/tipoPreso/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = registroPresosService.getRegistroPresosByIdTipoPreso(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateRegistroPresos(RegistroPresosDto registroPresosDto) {
         log.info("PUT /registroPresos");
         ResponseSuccessfullyDto responseSuccessfullyDto = registroPresosService.updateRegistroPresos(registroPresosDto);

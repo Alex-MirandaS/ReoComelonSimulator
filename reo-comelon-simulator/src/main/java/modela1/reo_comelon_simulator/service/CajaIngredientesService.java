@@ -30,6 +30,22 @@ public class CajaIngredientesService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+    public ResponseSuccessfullyDto getCajaIngredByIdIngrediente(Integer id) {
+        List<CajaIngredientes> list = caja_ingredientesCrud.getCajaIngredByIdIngrediente(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
+    public ResponseSuccessfullyDto getCajaIngredByIdOcupacionCaja(Integer id) {
+        List<CajaIngredientes> list = caja_ingredientesCrud.getCajaIngredByIdOcupacionCaja(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
     public ResponseSuccessfullyDto getCajaIngredientesById(Integer id) {
         Optional<CajaIngredientes> optional = caja_ingredientesCrud.findById(id);
         if (optional.isEmpty()) {

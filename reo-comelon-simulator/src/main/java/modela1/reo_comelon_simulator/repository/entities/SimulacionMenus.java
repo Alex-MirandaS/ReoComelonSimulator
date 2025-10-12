@@ -14,11 +14,11 @@ public class SimulacionMenus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_simulacion", referencedColumnName = "id")
     private RegistroSimulacion registroSimulacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_menu", referencedColumnName = "id")
     private Menu menu;
 }

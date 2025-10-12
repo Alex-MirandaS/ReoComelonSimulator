@@ -14,19 +14,19 @@ public class DetalleMenu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_menu", referencedColumnName = "id")
     private Menu menu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_receta_des", referencedColumnName = "id")
     private Receta receta_des;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_receta_lunch", referencedColumnName = "id")
     private Receta receta_lunch;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_receta_cena", referencedColumnName = "id")
     private Receta receta_cena;
 }

@@ -17,6 +17,9 @@ public interface DetalleMenuApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getDetalleMenuById(@PathVariable Integer id);
 
+    @GetMapping("/menu/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getDetalleMenuByIdMenu(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateDetalleMenu(@RequestBody DetalleMenuDto detalleMenuDto);
 

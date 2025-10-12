@@ -31,6 +31,13 @@ public class BitacoraRegistroPresosController implements BitacoraRegistroPresosA
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getBitacoraRegistroPresosByIdRegistroPresos(Integer id) {
+        log.info("GET /bitacoraRegistroPresos/registroPresos/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = bitacoraRegistroPresosService.getBitacoraRegistroPresosByIdRegistroPresos(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> deleteBitacoraRegistroPresos(Integer id) {
         log.info("DELETE /bitacoraRegistroPresos/{id}");
         ResponseSuccessfullyDto responseSuccessfullyDto = bitacoraRegistroPresosService.deleteBitacoraRegistroPresos(id);

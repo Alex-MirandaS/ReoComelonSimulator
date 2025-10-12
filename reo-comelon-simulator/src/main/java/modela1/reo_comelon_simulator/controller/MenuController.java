@@ -39,6 +39,13 @@ public class MenuController implements MenuApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getMenuByIdTipoPreso(Integer id) {
+        log.info("GET /menu/tipoPreso/{id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = menuService.getMenuByIdTipoPreso(id);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateMenu(MenuDto menuDto) {
         log.info("PUT /menu");
         ResponseSuccessfullyDto responseSuccessfullyDto = menuService.updateMenu(menuDto);

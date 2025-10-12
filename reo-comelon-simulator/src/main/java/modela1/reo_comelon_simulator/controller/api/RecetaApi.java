@@ -17,6 +17,12 @@ public interface RecetaApi {
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getRecetaById(@PathVariable Integer id);
 
+    @GetMapping("/tipoReceta/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getRecetaByIdTipoReceta(@PathVariable Integer id);
+
+    @GetMapping("/esPremiun/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getRecetaByesPremiun(@PathVariable Boolean id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateReceta(@RequestBody RecetaDto recetaDto);
 
