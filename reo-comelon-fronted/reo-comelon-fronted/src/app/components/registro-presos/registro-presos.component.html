@@ -1,0 +1,66 @@
+<mat-card>
+  <mat-card-title>Registro Presos</mat-card-title>
+  <mat-card-content>
+    <form (ngSubmit)="submit()" [formGroup]="registroForm">
+      <mat-form-field appearance="fill" style="width:100%">
+        <mat-label>Tipo Preso</mat-label>
+        <mat-select formControlName="id_tipo_preso">
+          <mat-option *ngFor="let tipo of tiposPreso" [value]="tipo.id">
+            {{ tipo.tipoPreso }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" style="width:100%">
+        <mat-label>Cantidad</mat-label>
+        <input matInput formControlName="cantidad" type="number">
+      </mat-form-field>
+
+      <mat-checkbox formControlName="activo">Activo</mat-checkbox>
+
+      <div style="margin-top:12px">
+        <button mat-raised-button color="primary" type="submit">Crear Registro</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<mat-card style="margin-top:16px">
+  <mat-card-title>Lista de Presos</mat-card-title>
+  <mat-card-content>
+
+    <table mat-table [dataSource]="registros" class="mat-elevation-z8" *ngIf="registros.length > 0; else null">
+      <!-- Columna ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let r"> {{r.id}} </td>
+      </ng-container>
+
+      <!-- Columna Tipo -->
+      <ng-container matColumnDef="tipoPreso">
+        <th mat-header-cell *matHeaderCellDef> Tipo Preso </th>
+        <td mat-cell *matCellDef="let r"> {{r.tipoPreso?.tipoPreso}} </td>
+      </ng-container>
+
+      <!-- Columna Cantidad -->
+      <ng-container matColumnDef="cantidad">
+        <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+        <td mat-cell *matCellDef="let r"> {{r.cantidad}} </td>
+      </ng-container>
+
+      <!-- Columna Activo -->
+      <ng-container matColumnDef="activo">
+        <th mat-header-cell *matHeaderCellDef> Activo </th>
+        <td mat-cell *matCellDef="let r"> {{r.activo ? 'Sí' : 'No'}} </td>
+      </ng-container>
+
+      <!-- Columna Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let r">
+          <button mat-button color="accent" (click)="viewBitacora(r.id)">Ver Bitácora</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['id', 'tipoPreso', 'cantidad', 'activo', 'acciones']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id', 'tipoPreso', 'cantidad', 'activo', 'acciones'];"><*

@@ -53,12 +53,18 @@ public class IngredienteService {
     public ResponseSuccessfullyDto createIngrediente(NewIngredienteDto newDto) {
         Ingrediente obj = new Ingrediente();
         obj.setIngrediente(newDto.getIngrediente());
-        obj.setCantidad(newDto.getCantidad());
+        obj.setCantidad(0);
         obj.setVida_util_dias(newDto.getVida_util_dias());
 
         try{
-            ingredienteCrud.save(obj);
-            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Ingrediente creado exitosamente").build();
+            Ingrediente saved = ingredienteCrud.save(obj);
+
+            // Retornar el ID dentro del body del DTO
+            return ResponseSuccessfullyDto.builder()
+                    .code(HttpStatus.CREATED)
+                    .message("Ingrediente creado exitosamente")
+                    .body(Map.of("id", saved.getId()))  // <-- aquí agregamos el ID
+                    .build();
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar el registro");
         }

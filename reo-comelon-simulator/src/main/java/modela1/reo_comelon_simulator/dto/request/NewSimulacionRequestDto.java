@@ -16,5 +16,5 @@ public class NewSimulacionRequestDto {
     private Boolean esPremium;
     private Integer dias;
     private LocalDate fechaInicio;
-
+    private Boolean optimizado;
 }

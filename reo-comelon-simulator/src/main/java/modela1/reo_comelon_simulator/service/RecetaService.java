@@ -127,5 +127,13 @@ public class RecetaService {
         return optional;
     }
 
+    public List<Receta> getRecetaByIdTipoRecetaAndEsPremium(Boolean id, Integer idTipoReceta) {
+        List<Receta> optional = recetaCrud.getRecetaByIdTipoRecetaAndEsPremium(idTipoReceta,id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return optional;
+    }
+
 
 }

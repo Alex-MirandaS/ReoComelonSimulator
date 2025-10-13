@@ -37,32 +37,29 @@ public class SimulacionService {
     private final SimulacionMenusCrud simulacionMenusCrud;
 
     public ResponseSuccessfullyDto runSimulacion(NewSimulacionRequestDto dto) {
-
-        // 1️⃣ Obtener datos base
+        //Obtener Registros de Presos y Espacio en Bodega
         RegistroPresos registroPresos = registroPresosService.getRegistroPresosByIdRegistroPresos(dto.getIdRegistroPresos());
         RegistroBodega bodega = registroBodegaService.getRegistroBodegaByIdRegistroBodega(dto.getIdBodega());
         int cantidadReos = registroPresos.getCantidad();
-
-        List<Receta> recetas = (dto.getEsPremium()
-                        ? recetaService.getAllRecetaListByEsPremiun(true)
-                        : recetaService.getAllRecetaListByEsPremiun(false));
-
-        List<Menu> menus = generarMenusAutomaticos(dto.getDias(), dto.getEsPremium());
-
+        //Genera los menús automáticos
+        List<Menu> menus = generarMenusAutomaticos(dto.getDias(), dto.getEsPremium(), dto.getOptimizado());
+        //Genera los Ingredientes totales
         List<Ingrediente> ingredientes = calcularIngredientesTotales(menus, cantidadReos);
 
         double espacioUsado = calcularEspacioUsado(ingredientes);
         double espacioDisponible = bodega.getCapacidad();
         double costoTotal = calcularCostoTotal(ingredientes);
-
+        LocalDate fechaFin = dto.getFechaInicio().plusDays(dto.getDias());
         RegistroSimulacion simulacion = new RegistroSimulacion();
+        simulacion.setNombre("Simulación "+dto.getFechaInicio()+"-"+fechaFin);
         simulacion.setRegistroPresos(registroPresosService.getRegistroPresosByIdRegistroPresos(dto.getIdRegistroPresos()));
         simulacion.setRegistroBodega(registroBodegaService.getRegistroBodegaByIdRegistroBodega(dto.getIdBodega()));
         simulacion.setDias(dto.getDias());
         simulacion.setFecha_inicio(dto.getFechaInicio());
-        simulacion.setFecha_fin(dto.getFechaInicio().plusDays(dto.getDias()));
+        simulacion.setFecha_fin(fechaFin);
         simulacion.setEs_premium(dto.getEsPremium());
         simulacion.setPresupuesto(costoTotal);
+        //verificar
         simulacion.setPerdida(espacioUsado > espacioDisponible ? costoTotal * 0.05 : 0.0);
 
         registroSimulacionCrud.save(simulacion);
@@ -83,11 +80,17 @@ public class SimulacionService {
                 .build();
     }
 
-    private List<Menu> generarMenusAutomaticos(int dias, boolean esPremium) {
+    private List<Menu> generarMenusAutomaticos(int dias, boolean esPremium, boolean esOptimizado) {
         try {
+            //Listar Recetas, según su optimización
             List<Receta> recetasDesayuno = recetaService.getRecetaByIdesPremiunIdTipoReceta(esPremium,1);
             List<Receta> recetasAlmuerzo = recetaService.getRecetaByIdesPremiunIdTipoReceta(esPremium,2);
             List<Receta> recetasCena = recetaService.getRecetaByIdesPremiunIdTipoReceta(esPremium,3);
+            if(esOptimizado){
+                recetasDesayuno = recetaService.getRecetaByIdTipoRecetaAndEsPremium(esPremium,1);
+                recetasAlmuerzo = recetaService.getRecetaByIdTipoRecetaAndEsPremium(esPremium,2);
+                recetasCena = recetaService.getRecetaByIdTipoRecetaAndEsPremium(esPremium,3);
+            }
 
             if (recetasDesayuno == null || recetasDesayuno.isEmpty() || recetasAlmuerzo == null || recetasAlmuerzo.isEmpty() || recetasCena == null || recetasCena.isEmpty()) {
                 throw new BusinessException(HttpStatus.NOT_FOUND, "No existen recetas para generar menús");
@@ -98,10 +101,21 @@ public class SimulacionService {
 
             for (int i = 0; i < dias; i++) {
                 //CAMBIAR A CALCULO DE OPTIMIZACIÓN
-                // Elegir 3 recetas al azar para desayuno, almuerzo y cena
-                Receta desayuno = recetasDesayuno.get(random.nextInt(recetasDesayuno.size()));
-                Receta almuerzo = recetasAlmuerzo.get(random.nextInt(recetasAlmuerzo.size()));
-                Receta cena = recetasCena.get(random.nextInt(recetasCena.size()));
+                Receta desayuno = null;
+                Receta almuerzo = null;
+                Receta cena = null;
+                if(esOptimizado){
+                    // Elegir 3 recetas (las que contengan menor cantidad de ingrediente y menor gasto total) para desayuno, almuerzo y cena (La misma para todos los días)
+                    desayuno = recetasDesayuno.get(0);
+                    almuerzo = recetasAlmuerzo.get(0);
+                    cena = recetasCena.get(0);
+                }else{
+                    // Elegir 3 recetas al azar para desayuno, almuerzo y cena
+                    desayuno = recetasDesayuno.get(random.nextInt(recetasDesayuno.size()));
+                    almuerzo = recetasAlmuerzo.get(random.nextInt(recetasAlmuerzo.size()));
+                    cena = recetasCena.get(random.nextInt(recetasCena.size()));
+                }
+
 
                 // Crear el menú
                 Menu menu = new Menu();

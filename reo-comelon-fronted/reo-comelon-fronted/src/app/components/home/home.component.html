@@ -1,0 +1,114 @@
+<mat-card>
+  <mat-card-title>Crear Simulación</mat-card-title>
+  <mat-card-content [formGroup]="simulacionForm">
+    <mat-form-field style="width:100%" appearance="fill">
+      <mat-label>Registro Presos</mat-label>
+      <mat-select formControlName="idRegistroPresos">
+        <mat-option *ngFor="let rp of registroPresos" [value]="rp.id">
+          {{rp.tipoPreso.tipoPreso}} ({{rp.cantidad}})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field style="width:100%" appearance="fill">
+      <mat-label>Bodega</mat-label>
+      <mat-select formControlName="idBodega">
+        <mat-option *ngFor="let b of registroBodega" [value]="b.id">
+          {{b.bodega}} (Capacidad: {{b.capacidad}})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field style="width:100%" appearance="fill">
+      <mat-label>Días</mat-label>
+      <input matInput type="number" formControlName="dias">
+    </mat-form-field>
+
+    <mat-form-field style="width:100%" appearance="fill">
+      <mat-label>Fecha Inicio</mat-label>
+      <input matInput type="date" formControlName="fechaInicio">
+    </mat-form-field>
+
+    <mat-checkbox formControlName="esPremium">Es premium</mat-checkbox>
+
+    <div style="margin-top:12px">
+      <button mat-raised-button color="primary" (click)="crearSimulacion()">Crear Simulación</button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- Mantén tu tabla de registros -->
+<mat-card style="margin-top:16px">
+  <mat-card-title>Registros de Simulación</mat-card-title>
+  <mat-card-content>
+    <table mat-table [dataSource]="registros" class="mat-elevation-z8" *ngIf="registros.length > 0">
+
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let r"> {{r.id}} </td>
+      </ng-container>
+    
+      <!-- Nombre -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let r"> {{r.nombre || '-' }} </td>
+      </ng-container>
+    
+      <!-- Días -->
+      <ng-container matColumnDef="dias">
+        <th mat-header-cell *matHeaderCellDef> Días </th>
+        <td mat-cell *matCellDef="let r"> {{r.dias}} </td>
+      </ng-container>
+    
+      <!-- Fecha Inicio -->
+      <ng-container matColumnDef="fecha_inicio">
+        <th mat-header-cell *matHeaderCellDef> Inicio </th>
+        <td mat-cell *matCellDef="let r"> {{r.fecha_inicio | date}} </td>
+      </ng-container>
+    
+      <!-- Fecha Fin -->
+      <ng-container matColumnDef="fecha_fin">
+        <th mat-header-cell *matHeaderCellDef> Fin </th>
+        <td mat-cell *matCellDef="let r"> {{r.fecha_fin | date}} </td>
+      </ng-container>
+    
+      <!-- Es Premium -->
+      <ng-container matColumnDef="es_premium">
+        <th mat-header-cell *matHeaderCellDef> Premium </th>
+        <td mat-cell *matCellDef="let r"> {{r.es_premium ? 'Sí' : 'No'}} </td>
+      </ng-container>
+    
+      <!-- Presupuesto -->
+      <ng-container matColumnDef="presupuesto">
+        <th mat-header-cell *matHeaderCellDef> Presupuesto </th>
+        <td mat-cell *matCellDef="let r"> {{r.presupuesto | currency:'GTQ'}} </td>
+      </ng-container>
+    
+      <!-- Pérdida -->
+      <ng-container matColumnDef="perdida">
+        <th mat-header-cell *matHeaderCellDef> Pérdida </th>
+        <td mat-cell *matCellDef="let r"> {{r.perdida | currency:'GTQ'}} </td>
+      </ng-container>
+    
+      <!-- Registro Presos -->
+      <ng-container matColumnDef="registroPresos">
+        <th mat-header-cell *matHeaderCellDef> Presos </th>
+        <td mat-cell *matCellDef="let r">
+          {{r.registroPresos.tipoPreso.tipoPreso}} ({{r.registroPresos.cantidad}})
+        </td>
+      </ng-container>
+    
+      <!-- Registro Bodega -->
+      <ng-container matColumnDef="registroBodega">
+        <th mat-header-cell *matHeaderCellDef> Bodega </th>
+        <td mat-cell *matCellDef="let r">
+          {{r.registroBodega.bodega}} (Capacidad: {{r.registroBodega.capacidad}})
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>  
+  </mat-card-content>
+</mat-card>
