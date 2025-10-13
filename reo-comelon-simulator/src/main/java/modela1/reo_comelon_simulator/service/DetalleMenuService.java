@@ -37,6 +37,7 @@ public class DetalleMenuService {
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar el registro");
         }
     }
+
     public ResponseSuccessfullyDto updateDetalleMenu(DetalleMenuDto dto) {
         Optional<DetalleMenu> optional = detalle_menuCrud.findById(dto.getId());
         if(optional.isEmpty()){
@@ -63,6 +64,15 @@ public class DetalleMenuService {
         }
         return optional.get();
     }
+
+    public List<DetalleMenu> getDetalleMenuByIdMenuList(Integer id) {
+        List<DetalleMenu> list = detalle_menuCrud.getDetalleMenuByIdMenu(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return list;
+    }
+
 
     public List<DetalleMenu> getAllDetalleMenuList() {
         List<DetalleMenu> list = detalle_menuCrud.findAll();

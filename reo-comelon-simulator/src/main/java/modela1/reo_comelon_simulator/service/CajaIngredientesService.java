@@ -105,10 +105,10 @@ public class CajaIngredientesService {
         }
         return optional.get();
     }
-    public List<CajaIngredientes> getAllCajaIngredientesList() {
-        List<CajaIngredientes> list = caja_ingredientesCrud.findAll();
-        if(list.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"CajaIngredientes not exists");
+    public List<CajaIngredientes> getAllCajaIngredientesListByIdIngrediente(Integer id) {
+        List<CajaIngredientes> list = caja_ingredientesCrud.getCajaIngredByIdIngrediente(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
         }
         return list;
     }

@@ -111,12 +111,21 @@ public class RecetaService {
         return optional.get();
     }
 
-    public List<Receta> getAllRecetaList() {
-        List<Receta> list = recetaCrud.findAll();
-        if(list.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"Receta not exists");
+    public List<Receta> getAllRecetaListByEsPremiun(Boolean id) {
+        List<Receta> optional = recetaCrud.getRecetaByIdesPremiun(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
         }
-        return list;
+        return optional;
     }
+
+    public List<Receta> getRecetaByIdesPremiunIdTipoReceta(Boolean id, Integer idTipoReceta) {
+        List<Receta> optional = recetaCrud.getRecetaByIdesPremiunIdTipoReceta(id,idTipoReceta);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return optional;
+    }
+
 
 }

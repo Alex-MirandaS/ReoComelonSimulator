@@ -13,5 +13,8 @@ public interface RecetaCrud extends JpaRepository<Receta, Integer> {
     List<Receta> getRecetaByIdTipoReceta(Integer id_Tipo_Receta);
 
     @Query(value = "select * from receta where es_premium = ? ", nativeQuery = true)
-    List<Receta> getRecetaByIdesPremiun(Boolean id_Tipo_Receta);
+    List<Receta> getRecetaByIdesPremiun(Boolean es_premium);
+
+    @Query(value = "select * from receta where es_premium = ? and id_Tipo_Receta = ? ", nativeQuery = true)
+    List<Receta> getRecetaByIdesPremiunIdTipoReceta(Boolean es_premium, Integer id_Tipo_Receta);
 }

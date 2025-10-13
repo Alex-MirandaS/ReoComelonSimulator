@@ -19,6 +19,8 @@ import modela1.reo_comelon_simulator.repository.crud.RecetaIngredienteCrud;
 public class RecetaIngredienteService {
 
     private final RecetaIngredienteCrud receta_ingredienteCrud;
+    private final RecetaService recetaService;
+    private final IngredienteService ingredienteService;
 
     public ResponseSuccessfullyDto getAllRecetaIngrediente() {
         List<RecetaIngrediente> list = receta_ingredienteCrud.findAll();
@@ -44,6 +46,7 @@ public class RecetaIngredienteService {
         }
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
+
     public ResponseSuccessfullyDto deleteRecetaIngrediente(Integer id) {
         Optional<RecetaIngrediente> optional = receta_ingredienteCrud.findById(id);
         if (optional.isEmpty()) {
@@ -56,10 +59,6 @@ public class RecetaIngredienteService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al eliminar el registro");
         }
     }
-
-    private final RecetaService recetaService;
-    private final IngredienteService ingredienteService;
-
 
     public ResponseSuccessfullyDto createRecetaIngrediente(NewRecetaIngredienteDto newDto) {
         RecetaIngrediente obj = new RecetaIngrediente();
@@ -101,6 +100,14 @@ public class RecetaIngredienteService {
         List<RecetaIngrediente> list = receta_ingredienteCrud.findAll();
         if(list.isEmpty()){
             throw new BusinessException(HttpStatus.NOT_FOUND,"RecetaIngrediente not exists");
+        }
+        return list;
+    }
+
+    public List<RecetaIngrediente> getRecetaIngredByIdRecetaObj(Integer id) {
+        List<RecetaIngrediente> list = receta_ingredienteCrud.getRecetaIngredByIdReceta(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
         }
         return list;
     }

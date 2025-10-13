@@ -75,6 +75,19 @@ public class MenuService {
         }
     }
 
+    public Menu createMenuAndReturn(NewMenuDto newMenuDto) {
+        Menu menu = new Menu();
+        menu.setFecha(newMenuDto.getFecha());
+        menu.setTipoPreso(tipoPresoService.getTipoPresoByIdTipoPreso(newMenuDto.getId_tipo_preso()));
+
+        try {
+            return menuCrud.save(menu); // ahora devolvemos el objeto persistido
+        } catch (Exception exception) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al guardar el Menú");
+        }
+    }
+
+
     public ResponseSuccessfullyDto updateMenu(MenuDto menuDto){
 
         Optional<Menu> optional = menuCrud.findById(menuDto.getId());
