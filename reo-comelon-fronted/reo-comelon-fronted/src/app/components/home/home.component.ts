@@ -7,6 +7,10 @@ import { FormBuilder, Validators } from '@angular/forms';
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
+simulacionResultado: any = null; 
+menusColumns: string[] = ['fecha', 'tipoPreso', 'desayuno', 'almuerzo', 'cena'];
+ingredientesColumns: string[] = ['nombre', 'cantidad', 'unidad'];
+
   registros: any[] = [];
   registroPresos: any[] = [];
   registroBodega: any[] = [];
@@ -21,6 +25,7 @@ export class HomeComponent implements OnInit {
     idRegistroPresos: [null, Validators.required],
     idBodega: [null, Validators.required],
     esPremium: [false],
+    optimizado: [false], 
     dias: [7, Validators.required],
     fechaInicio: ['', Validators.required]
   });
@@ -56,25 +61,27 @@ export class HomeComponent implements OnInit {
 
   crearSimulacion() {
     if (this.simulacionForm.invalid) return;
-
+  
     const body = {
       idRegistroPresos: this.simulacionForm.value.idRegistroPresos,
       idBodega: this.simulacionForm.value.idBodega,
       esPremium: this.simulacionForm.value.esPremium,
+      optimizado: this.simulacionForm.value.optimizado,
       dias: this.simulacionForm.value.dias,
       fechaInicio: this.simulacionForm.value.fechaInicio
     };
-
+  
     this.loading = true;
     this.api.runSimulacion(body).subscribe({
-      next: () => { 
+      next: (res) => { 
         this.loading = false; 
-        this.simulacionForm.reset({ dias: 7, esPremium: false });
+        this.simulacionForm.reset({ dias: 7, esPremium: false, optimizado: false });
+        this.simulacionResultado = res; // ✅ guardamos la respuesta
         this.loadRegistros(); 
       },
       error: () => { this.loading = false; }
     });
-  }
+  }  
 
   runSimulacion() {
     this.loading = true;

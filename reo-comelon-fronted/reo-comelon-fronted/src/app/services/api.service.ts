@@ -8,7 +8,6 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // Simulation
   //SIMULACION
   runSimulacion(body?: any): Observable<any> {
     return this.http.post(`${this.base}/simulacion/run`, body || {});

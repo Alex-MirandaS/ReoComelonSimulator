@@ -31,6 +31,8 @@
 
     <mat-checkbox formControlName="esPremium">Es premium</mat-checkbox>
 
+    <mat-checkbox formControlName="optimizado">Optimizado</mat-checkbox>
+
     <div style="margin-top:12px">
       <button mat-raised-button color="primary" (click)="crearSimulacion()">Crear Simulación</button>
     </div>
@@ -112,3 +114,68 @@
     </table>  
   </mat-card-content>
 </mat-card>
+
+<!-- Menús generados -->
+<mat-card *ngIf="simulacionResultado?.menusGenerados?.length > 0" style="margin-top:16px">
+  <mat-card-title>Menús Generados</mat-card-title>
+  <mat-card-content>
+    <table mat-table [dataSource]="simulacionResultado.menusGenerados" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef> Fecha </th>
+        <td mat-cell *matCellDef="let menu"> {{menu.fecha | date}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipoPreso">
+        <th mat-header-cell *matHeaderCellDef> Tipo Preso </th>
+        <td mat-cell *matCellDef="let menu"> {{menu.tipoPreso.tipoPreso}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="desayuno">
+        <th mat-header-cell *matHeaderCellDef> Desayuno </th>
+        <td mat-cell *matCellDef="let menu"> {{menu.receta_des.nombre}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="almuerzo">
+        <th mat-header-cell *matHeaderCellDef> Almuerzo </th>
+        <td mat-cell *matCellDef="let menu"> {{menu.receta_lunch.nombre}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cena">
+        <th mat-header-cell *matHeaderCellDef> Cena </th>
+        <td mat-cell *matCellDef="let menu"> {{menu.receta_cena.nombre}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="menusColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: menusColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
+
+<!-- Ingredientes requeridos -->
+<mat-card *ngIf="simulacionResultado?.ingredientesRequeridos?.length > 0" style="margin-top:16px">
+  <mat-card-title>Ingredientes Requeridos</mat-card-title>
+  <mat-card-content>
+    <table mat-table [dataSource]="simulacionResultado.ingredientesRequeridos" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let ing"> {{ing.nombre}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cantidad">
+        <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+        <td mat-cell *matCellDef="let ing"> {{ing.cantidad}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="unidad">
+        <th mat-header-cell *matHeaderCellDef> Unidad </th>
+        <td mat-cell *matCellDef="let ing"> {{ing.unidad}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="ingredientesColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: ingredientesColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
+
