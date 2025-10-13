@@ -30,7 +30,9 @@ export class ApiService {
   getIngredientesPorReceta(idReceta: number) {
     return this.http.get(`${this.base}/recetaIngrediente/receta/${idReceta}`);
   }
-
+  //Menus
+  getSimulacionMenus(id: number) { return this.http.get(`${this.base}/simulacionMenus/simulacion/${id}`); }
+  
   // Registro Bodega
   createRegistroBodega(body: any) { return this.http.post(`${this.base}/registroBodega`, body); }
   getAllRegistroBodega() { return this.http.get(`${this.base}/registroBodega/all`); }

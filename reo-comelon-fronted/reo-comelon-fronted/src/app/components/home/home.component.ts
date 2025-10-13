@@ -1,94 +1,95 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../services/api.service';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
-simulacionResultado: any = null; 
-menusColumns: string[] = ['fecha', 'tipoPreso', 'desayuno', 'almuerzo', 'cena'];
-ingredientesColumns: string[] = ['nombre', 'cantidad', 'unidad'];
+  simulacionForm = this.fb.group({
+    idRegistroPresos: [null, Validators.required],
+    idBodega: [null, Validators.required],
+    dias: [1, [Validators.required, Validators.min(1)]],
+    fechaInicio: [null, Validators.required],
+    esPremium: [false],
+    optimizado: [false]
+  });
 
   registros: any[] = [];
   registroPresos: any[] = [];
   registroBodega: any[] = [];
+  resultadoSimulacion: any = null;
   loading = false;
+
   displayedColumns: string[] = [
-    'id', 'nombre', 'dias', 'fecha_inicio', 'fecha_fin', 
-    'es_premium', 'presupuesto', 'perdida', 
-    'registroPresos', 'registroBodega'
+    'id', 'nombre', 'dias', 'fecha_inicio', 'es_premium', 'presupuesto', 'perdida', 'detalles'
   ];
 
-  simulacionForm = this.fb.group({
-    idRegistroPresos: [null, Validators.required],
-    idBodega: [null, Validators.required],
-    esPremium: [false],
-    optimizado: [false], 
-    dias: [7, Validators.required],
-    fechaInicio: ['', Validators.required]
-  });
-
-  constructor(private api: ApiService, private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.loadRegistros();
-    this.loadRegistroBodega();
     this.loadRegistroPresos();
+    this.loadRegistroBodega();
   }
 
-  loadRegistros() {
-    this.api.getRegistroSimulacionAll().subscribe({
-      next: (res:any) => { this.registros = res?.body || res || []; },
-      error: (err)=> { console.error(err); }
-    });
-  }
-
-  loadRegistroPresos() {
-    this.api.getAllRegistroPresos().subscribe({
-      next: (res:any) => { this.registroPresos = res?.body || res || []; },
-      error: console.error
-    });
-  }
-
-  loadRegistroBodega() {
-    this.api.getAllRegistroBodega().subscribe({
-      next: (res:any) => { this.registroBodega = res?.body || res || []; },
-      error: console.error
-    });
-  }
-
-  crearSimulacion() {
-    if (this.simulacionForm.invalid) return;
-  
-    const body = {
-      idRegistroPresos: this.simulacionForm.value.idRegistroPresos,
-      idBodega: this.simulacionForm.value.idBodega,
-      esPremium: this.simulacionForm.value.esPremium,
-      optimizado: this.simulacionForm.value.optimizado,
-      dias: this.simulacionForm.value.dias,
-      fechaInicio: this.simulacionForm.value.fechaInicio
-    };
-  
-    this.loading = true;
-    this.api.runSimulacion(body).subscribe({
-      next: (res) => { 
-        this.loading = false; 
-        this.simulacionForm.reset({ dias: 7, esPremium: false, optimizado: false });
-        this.simulacionResultado = res; // ✅ guardamos la respuesta
-        this.loadRegistros(); 
+  loadRegistros(): void {
+    this.apiService.getRegistroSimulacionAll().subscribe({
+      next: (res: any) => {
+        this.registros = res.body || [];
       },
-      error: () => { this.loading = false; }
-    });
-  }  
-
-  runSimulacion() {
-    this.loading = true;
-    this.api.runSimulacion({}).subscribe({
-      next: (res)=> { this.loading = false; this.loadRegistros(); },
-      error: ()=> { this.loading = false; }
+      error: (err) => console.error('Error cargando simulaciones', err)
     });
   }
 
+  loadRegistroPresos(): void {
+    this.apiService.getAllRegistroPresos().subscribe({
+      next: (res: any) => {
+        this.registroPresos = res.body || [];
+      },
+      error: (err) => console.error('Error cargando registro presos', err)
+    });
+  }
+
+  loadRegistroBodega(): void {
+    this.apiService.getAllRegistroBodega().subscribe({
+      next: (res: any) => {
+        this.registroBodega = res.body || [];
+      },
+      error: (err) => console.error('Error cargando bodega', err)
+    });
+  }
+
+  crearSimulacion(): void {
+    if (this.simulacionForm.invalid) return;
+
+    this.loading = true;
+    this.apiService.runSimulacion(this.simulacionForm.value).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        this.resultadoSimulacion = res.body;
+
+        alert(
+          `✅ Simulación generada exitosamente\n\n` +
+          `Costo Total: ${res.body.costoTotal}\n` +
+          `Espacio Usado: ${res.body.espacioUsado}\n` +
+          `Espacio Disponible: ${res.body.espacioDisponible}\n` +
+          `Pérdida: ${res.body.perdida}`
+        );
+
+        this.loadRegistros();
+        console.log('Resultado completo:', res);
+      },
+      error: (err) => {
+        console.error('Error creando simulación', err);
+        this.loading = false;
+        alert('❌ Error al generar la simulación');
+      }
+    });
+  }
+
+  verDetalles(simulacion: any): void {
+    alert(`Detalles de simulación ID: ${simulacion.id}`);
+  }
 }

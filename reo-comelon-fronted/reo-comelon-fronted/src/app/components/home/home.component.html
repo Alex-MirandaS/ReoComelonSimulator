@@ -1,7 +1,7 @@
 <mat-card>
   <mat-card-title>Crear Simulación</mat-card-title>
   <mat-card-content [formGroup]="simulacionForm">
-    <mat-form-field style="width:100%" appearance="fill">
+    <mat-form-field appearance="fill" style="width:100%">
       <mat-label>Registro Presos</mat-label>
       <mat-select formControlName="idRegistroPresos">
         <mat-option *ngFor="let rp of registroPresos" [value]="rp.id">
@@ -10,7 +10,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field style="width:100%" appearance="fill">
+    <mat-form-field appearance="fill" style="width:100%">
       <mat-label>Bodega</mat-label>
       <mat-select formControlName="idBodega">
         <mat-option *ngFor="let b of registroBodega" [value]="b.id">
@@ -19,163 +19,131 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field style="width:100%" appearance="fill">
+    <mat-form-field appearance="fill" style="width:100%">
       <mat-label>Días</mat-label>
       <input matInput type="number" formControlName="dias">
     </mat-form-field>
 
-    <mat-form-field style="width:100%" appearance="fill">
+    <mat-form-field appearance="fill" style="width:100%">
       <mat-label>Fecha Inicio</mat-label>
       <input matInput type="date" formControlName="fechaInicio">
     </mat-form-field>
 
     <mat-checkbox formControlName="esPremium">Es premium</mat-checkbox>
-
     <mat-checkbox formControlName="optimizado">Optimizado</mat-checkbox>
 
     <div style="margin-top:12px">
-      <button mat-raised-button color="primary" (click)="crearSimulacion()">Crear Simulación</button>
+      <button mat-raised-button color="primary" (click)="crearSimulacion()" [disabled]="loading">
+        {{loading ? 'Simulando...' : 'Crear Simulación'}}
+      </button>
     </div>
   </mat-card-content>
 </mat-card>
 
-<!-- Mantén tu tabla de registros -->
+<!-- Tabla de simulaciones -->
 <mat-card style="margin-top:16px">
   <mat-card-title>Registros de Simulación</mat-card-title>
   <mat-card-content>
     <table mat-table [dataSource]="registros" class="mat-elevation-z8" *ngIf="registros.length > 0">
 
-      <!-- ID -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef> ID </th>
         <td mat-cell *matCellDef="let r"> {{r.id}} </td>
       </ng-container>
-    
-      <!-- Nombre -->
+
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef> Nombre </th>
-        <td mat-cell *matCellDef="let r"> {{r.nombre || '-' }} </td>
+        <td mat-cell *matCellDef="let r"> {{r.nombre}} </td>
       </ng-container>
-    
-      <!-- Días -->
+
       <ng-container matColumnDef="dias">
         <th mat-header-cell *matHeaderCellDef> Días </th>
         <td mat-cell *matCellDef="let r"> {{r.dias}} </td>
       </ng-container>
-    
-      <!-- Fecha Inicio -->
+
       <ng-container matColumnDef="fecha_inicio">
         <th mat-header-cell *matHeaderCellDef> Inicio </th>
         <td mat-cell *matCellDef="let r"> {{r.fecha_inicio | date}} </td>
       </ng-container>
-    
-      <!-- Fecha Fin -->
-      <ng-container matColumnDef="fecha_fin">
-        <th mat-header-cell *matHeaderCellDef> Fin </th>
-        <td mat-cell *matCellDef="let r"> {{r.fecha_fin | date}} </td>
-      </ng-container>
-    
-      <!-- Es Premium -->
+
       <ng-container matColumnDef="es_premium">
         <th mat-header-cell *matHeaderCellDef> Premium </th>
         <td mat-cell *matCellDef="let r"> {{r.es_premium ? 'Sí' : 'No'}} </td>
       </ng-container>
-    
-      <!-- Presupuesto -->
+
       <ng-container matColumnDef="presupuesto">
         <th mat-header-cell *matHeaderCellDef> Presupuesto </th>
         <td mat-cell *matCellDef="let r"> {{r.presupuesto | currency:'GTQ'}} </td>
       </ng-container>
-    
-      <!-- Pérdida -->
+
       <ng-container matColumnDef="perdida">
         <th mat-header-cell *matHeaderCellDef> Pérdida </th>
         <td mat-cell *matCellDef="let r"> {{r.perdida | currency:'GTQ'}} </td>
       </ng-container>
-    
-      <!-- Registro Presos -->
-      <ng-container matColumnDef="registroPresos">
-        <th mat-header-cell *matHeaderCellDef> Presos </th>
+
+      <ng-container matColumnDef="detalles">
+        <th mat-header-cell *matHeaderCellDef> Detalles </th>
         <td mat-cell *matCellDef="let r">
-          {{r.registroPresos.tipoPreso.tipoPreso}} ({{r.registroPresos.cantidad}})
+          <button mat-button color="primary" (click)="verDetalles(r)">Ver Detalles</button>
         </td>
       </ng-container>
-    
-      <!-- Registro Bodega -->
-      <ng-container matColumnDef="registroBodega">
-        <th mat-header-cell *matHeaderCellDef> Bodega </th>
-        <td mat-cell *matCellDef="let r">
-          {{r.registroBodega.bodega}} (Capacidad: {{r.registroBodega.capacidad}})
-        </td>
-      </ng-container>
-    
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>  
+    </table>
   </mat-card-content>
 </mat-card>
 
-<!-- Menús generados -->
-<mat-card *ngIf="simulacionResultado?.menusGenerados?.length > 0" style="margin-top:16px">
-  <mat-card-title>Menús Generados</mat-card-title>
+<!-- 🔽 Resultado de la última simulación -->
+<mat-card *ngIf="resultadoSimulacion" style="margin-top:16px">
+  <mat-card-title>📊 Resultado de la Simulación</mat-card-title>
   <mat-card-content>
-    <table mat-table [dataSource]="simulacionResultado.menusGenerados" class="mat-elevation-z8">
+    <p><strong>ID Simulación:</strong> {{resultadoSimulacion.idSimulacion}}</p>
+    <p><strong>Costo Total:</strong> {{resultadoSimulacion.costoTotal}}</p>
+    <p><strong>Espacio Usado:</strong> {{resultadoSimulacion.espacioUsado}}</p>
+    <p><strong>Espacio Disponible:</strong> {{resultadoSimulacion.espacioDisponible}}</p>
+    <p><strong>Pérdida:</strong> {{resultadoSimulacion.perdida}}</p>
 
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef> Fecha </th>
-        <td mat-cell *matCellDef="let menu"> {{menu.fecha | date}} </td>
+    <h4> Menús Generados</h4>
+    <table mat-table [dataSource]="resultadoSimulacion.menusGenerados" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let m">{{m.id}}</td>
       </ng-container>
-
       <ng-container matColumnDef="tipoPreso">
         <th mat-header-cell *matHeaderCellDef> Tipo Preso </th>
-        <td mat-cell *matCellDef="let menu"> {{menu.tipoPreso.tipoPreso}} </td>
+        <td mat-cell *matCellDef="let m">{{m.tipoPreso.tipoPreso}}</td>
+      </ng-container>
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef> Fecha </th>
+        <td mat-cell *matCellDef="let m">{{m.fecha}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="desayuno">
-        <th mat-header-cell *matHeaderCellDef> Desayuno </th>
-        <td mat-cell *matCellDef="let menu"> {{menu.receta_des.nombre}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="almuerzo">
-        <th mat-header-cell *matHeaderCellDef> Almuerzo </th>
-        <td mat-cell *matCellDef="let menu"> {{menu.receta_lunch.nombre}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="cena">
-        <th mat-header-cell *matHeaderCellDef> Cena </th>
-        <td mat-cell *matCellDef="let menu"> {{menu.receta_cena.nombre}} </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="menusColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: menusColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="['id','tipoPreso','fecha']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id','tipoPreso','fecha']"></tr>
     </table>
-  </mat-card-content>
-</mat-card>
 
-<!-- Ingredientes requeridos -->
-<mat-card *ngIf="simulacionResultado?.ingredientesRequeridos?.length > 0" style="margin-top:16px">
-  <mat-card-title>Ingredientes Requeridos</mat-card-title>
-  <mat-card-content>
-    <table mat-table [dataSource]="simulacionResultado.ingredientesRequeridos" class="mat-elevation-z8">
-
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef> Nombre </th>
-        <td mat-cell *matCellDef="let ing"> {{ing.nombre}} </td>
+    <h4 style="margin-top:16px">🥦 Ingredientes Requeridos</h4>
+    <table mat-table [dataSource]="resultadoSimulacion.ingredientesRequeridos" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let i">{{i.id}}</td>
       </ng-container>
-
+      <ng-container matColumnDef="ingrediente">
+        <th mat-header-cell *matHeaderCellDef> Ingrediente </th>
+        <td mat-cell *matCellDef="let i">{{i.ingrediente}}</td>
+      </ng-container>
+      <ng-container matColumnDef="vida_util_dias">
+        <th mat-header-cell *matHeaderCellDef> Vida Útil (días) </th>
+        <td mat-cell *matCellDef="let i">{{i.vida_util_dias}}</td>
+      </ng-container>
       <ng-container matColumnDef="cantidad">
         <th mat-header-cell *matHeaderCellDef> Cantidad </th>
-        <td mat-cell *matCellDef="let ing"> {{ing.cantidad}} </td>
+        <td mat-cell *matCellDef="let i">{{i.cantidad}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="unidad">
-        <th mat-header-cell *matHeaderCellDef> Unidad </th>
-        <td mat-cell *matCellDef="let ing"> {{ing.unidad}} </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="ingredientesColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: ingredientesColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="['id','ingrediente','vida_util_dias','cantidad']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id','ingrediente','vida_util_dias','cantidad']"></tr>
     </table>
   </mat-card-content>
 </mat-card>
-
