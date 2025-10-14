@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import modela1.reo_comelon_simulator.dto.request.NewDetalleMenuDto;
 import modela1.reo_comelon_simulator.dto.request.NewMenuDto;
+import modela1.reo_comelon_simulator.dto.request.NewRegistroComprasDto;
 import modela1.reo_comelon_simulator.dto.request.NewSimulacionRequestDto;
 import modela1.reo_comelon_simulator.dto.response.MenuDto;
 import modela1.reo_comelon_simulator.dto.response.ResponseSuccessfullyDto;
 import modela1.reo_comelon_simulator.dto.response.SimulacionResultadoDto;
 import modela1.reo_comelon_simulator.exception.BusinessException;
-import modela1.reo_comelon_simulator.repository.crud.BitacoraRegistroOcupacionCajaCrud;
-import modela1.reo_comelon_simulator.repository.crud.RegistroSimulacionCrud;
-import modela1.reo_comelon_simulator.repository.crud.SimulacionMenusCrud;
+import modela1.reo_comelon_simulator.repository.crud.*;
 import modela1.reo_comelon_simulator.repository.entities.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,6 +34,9 @@ public class SimulacionService {
     private final CajaIngredientesService cajaIngredientesService;
     private final RegistroSimulacionCrud registroSimulacionCrud;
     private final SimulacionMenusCrud simulacionMenusCrud;
+    private final RegistroComprasService registroComprasService;
+    private final RegistroComprasCrud registroComprasCrud;
+    private final BitacoraRegistroBodegaCrud bitacoraRegistroBodegaCrud;
 
     public ResponseSuccessfullyDto runSimulacion(NewSimulacionRequestDto dto) {
         //Obtener Registros de Presos y Espacio en Bodega
@@ -61,7 +63,7 @@ public class SimulacionService {
         simulacion.setPresupuesto(costoTotal);
         //verificar
         simulacion.setPerdida(espacioUsado > espacioDisponible ? costoTotal * 0.05 : 0.0);
-
+        //generarRegistroCompras(simulacion, ingredientes);
         registroSimulacionCrud.save(simulacion);
 
         for (Menu menu : menus) {
@@ -70,6 +72,8 @@ public class SimulacionService {
             sm.setMenu(menuService.getMenuByIdMenu(menu.getId()));
             simulacionMenusCrud.save(sm);
         }
+
+        generarRegistroComprasYBitacora(simulacion, menus, cantidadReos, bodega);
 
         SimulacionResultadoDto resultado = SimulacionResultadoDto.builder().idSimulacion(simulacion.getId()).costoTotal(costoTotal).espacioUsado(espacioUsado).espacioDisponible(espacioDisponible).perdida(simulacion.getPerdida()).menusGenerados(menus).ingredientesRequeridos(ingredientes).build();
 
@@ -228,4 +232,177 @@ public class SimulacionService {
 
         return total;
     }
+    private void generarRegistroComprasYBitacora(RegistroSimulacion simulacion, List<Menu> menus, int cantidadReos, RegistroBodega bodega) {
+        // DEMANDA POR DIA
+        Map<LocalDate, Map<Integer, Integer>> demandaPorDia = new HashMap<>();
+        for (Menu menu : menus) {
+            LocalDate fecha = menu.getFecha();
+            List<DetalleMenu> detalles = detalleMenuService.getDetalleMenuByIdMenuList(menu.getId());
+            Map<Integer, Integer> demandaDia = demandaPorDia.computeIfAbsent(fecha, d -> new HashMap<>());
+            for (DetalleMenu detalle : detalles) {
+                List<Receta> recetas = Arrays.asList(detalle.getReceta_des(), detalle.getReceta_lunch(), detalle.getReceta_cena());
+                for (Receta receta : recetas) {
+                    List<RecetaIngrediente> recetaIngredientes = recetaIngredienteService.getRecetaIngredByIdRecetaObj(receta.getId());
+                    for (RecetaIngrediente ri : recetaIngredientes) {
+                        int idIng = ri.getIngrediente().getId();
+                        int unidades = ri.getCantidad() * cantidadReos;
+                        demandaDia.put(idIng, demandaDia.getOrDefault(idIng, 0) + unidades);
+                    }
+                }
+            }
+        }
+
+        // 2) Batches por ingrediente (FIFO). Batch almacena unidades y volumen ocupado.
+        class Batch {
+            LocalDate compra;
+            LocalDate vencimiento;
+            int unidades;
+            double volumen; // m3
+            Batch(LocalDate compra, LocalDate vencimiento, int unidades, double volumen){
+                this.compra = compra; this.vencimiento = vencimiento; this.unidades = unidades; this.volumen = volumen;
+            }
+        }
+        Map<Integer, Deque<Batch>> inventario = new HashMap<>();
+
+        LocalDate fechaInicio = simulacion.getFecha_inicio();
+        LocalDate fechaFin = simulacion.getFecha_fin(); // nota: en tu código fechaFin = inicio + dias
+
+        int totalDias = (int) java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, fechaFin);
+        // Si deseas incluir fechaFin como día final, usar <=; aquí iteramos 0..dias-1
+        for (int d = 0; d < totalDias; d++) {
+            LocalDate hoy = fechaInicio.plusDays(d);
+
+            // Antes de procesar demanda, eliminar batches vencidos (vencimiento < hoy)
+            for (Integer idIng : new HashSet<>(inventario.keySet())) {
+                Deque<Batch> cola = inventario.get(idIng);
+                if (cola == null) continue;
+                while (!cola.isEmpty() && (cola.peekFirst().vencimiento.isBefore(hoy) )) {
+                    cola.pollFirst();
+                }
+                if (cola.isEmpty()) inventario.remove(idIng);
+            }
+
+            // Calcular volumen actualmente ocupado en bodega (sumar volumen de todos batches)
+            double volumenOcupado = 0.0;
+            for (Deque<Batch> cola : inventario.values()) {
+                for (Batch b : cola) volumenOcupado += b.volumen;
+            }
+
+            // Procesar compra y consumo por cada ingrediente que aparece en la simulación (o en la demanda)
+            Set<Integer> ingredientesInvolucrados = new HashSet<>();
+            ingredientesInvolucrados.addAll(demandaPorDia.getOrDefault(hoy, Collections.emptyMap()).keySet());
+            // También considerar ingredientes de inventario (posible expiración)
+            ingredientesInvolucrados.addAll(inventario.keySet());
+
+            for (Integer idIngrediente : ingredientesInvolucrados) {
+                int demandaHoy = demandaPorDia.getOrDefault(hoy, Collections.emptyMap()).getOrDefault(idIngrediente, 0);
+
+                // sumar unidades disponibles
+                int disponibles = 0;
+                Deque<Batch> pila = inventario.getOrDefault(idIngrediente, new ArrayDeque<>());
+                for (Batch b : pila) disponibles += b.unidades;
+
+                // Si hay suficiente, consumir FIFO
+                int aConsumir = demandaHoy;
+                while (aConsumir > 0 && !pila.isEmpty()) {
+                    Batch first = pila.peekFirst();
+                    int take = Math.min(first.unidades, aConsumir);
+                    first.unidades -= take;
+                    aConsumir -= take;
+                    if (first.unidades == 0) pila.pollFirst();
+                }
+                // actualizar inventario mapa
+                if (!pila.isEmpty()) inventario.put(idIngrediente, pila); else inventario.remove(idIngrediente);
+
+                // Si faltó para cubrir la demanda, planificar compra para el mismo día (según vida útil)
+                if (aConsumir > 0) {
+                    // obtener datos de caja para ese ingrediente (asumimos al menos una caja disponible y tomamos la primera)
+                    List<CajaIngredientes> cajas = cajaIngredientesService.getAllCajaIngredientesListByIdIngrediente(idIngrediente);
+                    if (cajas == null || cajas.isEmpty()) {
+                        // no hay caja disponible para ese ingrediente, no se puede comprar -> saltar
+                        continue;
+                    }
+                    CajaIngredientes caja = cajas.get(0);
+                    int unidadesPorCaja = caja.getCantidad();
+                    double volumenPorCaja = caja.getOcupacionCaja().getOcupacion(); // m3 por caja
+                    Ingrediente ing = ingredienteService.getIngredienteByIdIngrediente(idIngrediente);
+                    int vidaUtil = ing.getVida_util_dias();
+
+                    // unidades necesarias después de lo ya consumido
+                    int unidadesNecesarias = aConsumir;
+
+                    // calcular cajas necesarias
+                    int cajasNecesarias = (int) Math.ceil((double) unidadesNecesarias / unidadesPorCaja);
+
+                    // verificar espacio en bodega: ¿caben cajasNecesarias?
+                    double espacioExtra = cajasNecesarias * volumenPorCaja;
+                    double espacioLibre = bodega.getCapacidad() - volumenOcupado;
+
+                    int cajasAComprar = cajasNecesarias;
+                    if (espacioExtra > espacioLibre) {
+                        // intentar comprar menos cajas que quepan
+                        int maxCajasQueCabes = (int) Math.floor(espacioLibre / volumenPorCaja);
+                        if (maxCajasQueCabes <= 0) {
+                            // no cabe ninguna caja: no comprar
+                            cajasAComprar = 0;
+                        } else {
+                            cajasAComprar = Math.min(maxCajasQueCabes, cajasNecesarias);
+                        }
+                    }
+
+                    if (cajasAComprar > 0) {
+                        int unidadesCompradas = cajasAComprar * unidadesPorCaja;
+                        LocalDate fechaVenc = hoy.plusDays(vidaUtil);
+
+                        // Crear y persistir registro de compra
+                        RegistroCompras compra = new RegistroCompras();
+                        compra.setRegistroSimulacion(simulacion);
+                        compra.setCajaIngredientes(caja);
+                        compra.setCantidad((double) unidadesCompradas); // guardamos unidades
+                        compra.setFechaCompra(hoy);
+                        compra.setFechaVencimiento(fechaVenc);
+                        registroComprasCrud.save(compra);
+                        // añadir batch al inventario
+                        double volumenComprado = cajasAComprar * volumenPorCaja;
+                        Deque<Batch> cola = inventario.computeIfAbsent(idIngrediente, k -> new ArrayDeque<>());
+                        cola.addLast(new Batch(hoy, fechaVenc, unidadesCompradas, volumenComprado));
+                        volumenOcupado += volumenComprado;
+
+                        // Consumir inmediatamente las unidades necesarias (si aún quedan)
+                        int pendiente = aConsumir - unidadesCompradas;
+                        if (pendiente < 0) pendiente = 0;
+                        // Consumir de los batches recién añadidos (ya que los hemos puesto al final)
+                        int aQuitar = Math.min(unidadesCompradas, aConsumir);
+                        int remainToConsume = aQuitar;
+                        while (remainToConsume > 0 && !cola.isEmpty()) {
+                            Batch last = cola.peekLast();
+                            int take = Math.min(last.unidades, remainToConsume);
+                            last.unidades -= take;
+                            remainToConsume -= take;
+                            if (last.unidades == 0) cola.pollLast();
+                        }
+                        if (!cola.isEmpty()) inventario.put(idIngrediente, cola); else inventario.remove(idIngrediente);
+                    } else {
+                        // No se pudo comprar nada; opcional: registrar intento de compra fallido (no implementado)
+                    }
+                }
+            }
+
+            // Al terminar el dia, recalcular volumen ocupado
+            double volumenAlFinalDia = 0.0;
+            for (Deque<Batch> cola : inventario.values()) for (Batch b : cola) volumenAlFinalDia += b.volumen;
+
+            double capacidadLibre = bodega.getCapacidad() - volumenAlFinalDia;
+            if (capacidadLibre < 0) capacidadLibre = 0.0;
+
+            // Persistir entrada en bitacora_registro_bodega
+            BitacoraRegistroBodega bit = new BitacoraRegistroBodega();
+            bit.setRegistroBodega(bodega);
+            bit.setCapacidadLibre((int)Math.floor(capacidadLibre)); // si quieres double, adapta tipo
+            bit.setCapacidadUtilizada(volumenAlFinalDia);
+            bit.setFecha(hoy);
+            bitacoraRegistroBodegaCrud.save(bit);
+        }
+    }
+
 }

@@ -34,4 +34,29 @@ public interface RecetaCrud extends JpaRepository<Receta, Integer> {
             nativeQuery = true)
     List<Receta> getRecetaByIdTipoRecetaAndEsPremium(Integer id_Tipo_Receta, Boolean es_premium);
 
+    @Query(value = "SELECT  \n" +
+            "    r.id,\n" +
+            "    r.nombre,\n" +
+            "    r.id_Tipo_Receta,\n" +
+            "    r.es_premium\n" +
+            "FROM simulacion_menus sm\n" +
+            "INNER JOIN registro_simulacion rs ON sm.id_simulacion = rs.id\n" +
+            "INNER JOIN menu m ON sm.id_menu = m.id\n" +
+            "INNER JOIN detalle_menu dm ON dm.id_menu = m.id\n" +
+            "INNER JOIN receta r ON r.id IN (dm.id_receta_des, dm.id_receta_lunch, dm.id_receta_cena)\n" +
+            "WHERE rs.id = ?1; ", nativeQuery = true)
+    List<Receta> getRecetaByIdSimulador(Integer id_simulador);
+
+
+    @Query(value = "    SELECT\n" +
+            "    r.id,\n" +
+            "    r.nombre,\n" +
+            "    r.id_Tipo_Receta,\n" +
+            "    r.es_premium\n" +
+            "    FROM detalle_menu dm\n" +
+            "    INNER JOIN receta r\n" +
+            "    ON r.id IN (dm.id_receta_des, dm.id_receta_lunch, dm.id_receta_cena)\n" +
+            "    WHERE dm.id_menu = ?1; ", nativeQuery = true)
+    List<Receta> getRecetaByIdMenu(Integer id_Menu);
+
 }

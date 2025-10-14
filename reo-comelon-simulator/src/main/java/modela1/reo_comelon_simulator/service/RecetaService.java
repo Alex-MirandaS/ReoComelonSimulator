@@ -31,6 +31,14 @@ public class RecetaService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+    public ResponseSuccessfullyDto getRecetaByIdSimulador(Integer id) {
+        List<Receta> optional = recetaCrud.getRecetaByIdSimulador(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional).build();
+    }
+
     public ResponseSuccessfullyDto getRecetaById(Integer id) {
         Optional<Receta> optional = recetaCrud.findById(id);
         if (optional.isEmpty()) {
@@ -41,6 +49,14 @@ public class RecetaService {
 
     public ResponseSuccessfullyDto getRecetaByIdTipoReceta(Integer id) {
         List<Receta> optional = recetaCrud.getRecetaByIdTipoReceta(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(optional).build();
+    }
+
+    public ResponseSuccessfullyDto getRecetaByIdMenu(Integer id) {
+        List<Receta> optional = recetaCrud.getRecetaByIdMenu(id);
         if (optional.isEmpty()) {
             throw new BusinessException(HttpStatus.NOT_FOUND, "Registro no encontrado");
         }

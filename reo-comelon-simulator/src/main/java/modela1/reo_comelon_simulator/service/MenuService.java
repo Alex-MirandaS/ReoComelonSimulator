@@ -49,6 +49,14 @@ public class MenuService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
     }
 
+    public ResponseSuccessfullyDto getMenuByIdSimulacion(Integer id) {
+        List<Menu> list = menuCrud.getMenuByIdSimulacion(id);
+        if (list.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No se encontraron registros");
+        }
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(list).build();
+    }
+
     public ResponseSuccessfullyDto deleteMenu(Integer id) {
         Optional<Menu> optional = menuCrud.findById(id);
         if (optional.isEmpty()) {

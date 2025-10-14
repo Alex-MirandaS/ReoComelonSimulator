@@ -20,6 +20,9 @@ public interface MenuApi {
     @GetMapping("/tipoPreso/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getMenuByIdTipoPreso(@PathVariable Integer id);
 
+    @GetMapping("/simulacion/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getMenuByIdSimulacion(@PathVariable Integer id);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateMenu(@RequestBody MenuDto menuDto);
 

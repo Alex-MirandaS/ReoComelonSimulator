@@ -86,7 +86,7 @@ public class OcupacionCajaService {
         if(optional.isEmpty()){
             throw new BusinessException(HttpStatus.NOT_FOUND,"El registro no ha sido encontrado");
         }
-        OcupacionCaja ocupacionCaja = new OcupacionCaja();
+        OcupacionCaja ocupacionCaja = optional.get();
         ocupacionCaja.setOcupacion(ocupacionCajaDto.getOcupacion());
         ocupacionCaja.setActivo(ocupacionCajaDto.getActivo());
 
