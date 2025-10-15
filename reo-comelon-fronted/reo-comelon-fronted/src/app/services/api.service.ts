@@ -32,6 +32,7 @@ export class ApiService {
   }
   //Menus
   getSimulacionMenus(id: number) { return this.http.get(`${this.base}/simulacionMenus/simulacion/${id}`); }
+  getMenuByIdSimulacion(id:number) {return this.http.get(`${this.base}/menu/simulacion/${id}`); }
   
   // Registro Bodega
   createRegistroBodega(body: any) { return this.http.post(`${this.base}/registroBodega`, body); }
@@ -47,6 +48,10 @@ export class ApiService {
   createReceta(body: any) { return this.http.post(`${this.base}/receta`, body); }
   createRecetaIngrediente(body: any) { return this.http.post(`${this.base}/recetaIngrediente`, body); }
   getAllReceta() { return this.http.get(`${this.base}/receta/all`); }
+  getRecetaByIdSimulador(id: number) { return this.http.get(`${this.base}/receta/simulador/${id}`); }
+  getRecetaByIdMenu(id: number) { return this.http.get(`${this.base}/receta/menu/${id}`); }
   // Tipo Receta
   getAllTipoReceta() { return this.http.get(`${this.base}/tipoReceta/all`); }
+  // Registro Compras
+  getComprasByIdSimulador(id: number) { return this.http.get(`${this.base}/registroCompras/simulacion/${id}`); }
 }

@@ -15,12 +15,15 @@ export class HomeComponent implements OnInit {
     esPremium: [false],
     optimizado: [false]
   });
-
+  comprasSimulacion: any[] = [];
   registros: any[] = [];
   registroPresos: any[] = [];
   registroBodega: any[] = [];
   resultadoSimulacion: any = null;
   loading = false;
+  menusSimulacion: any[] = [];  
+  simulacionSeleccionada: any = null; 
+  recetasPorMenu: { [menuId: number]: any[] } = {}; 
 
   displayedColumns: string[] = [
     'id', 'nombre', 'dias', 'fecha_inicio', 'es_premium', 'presupuesto', 'perdida', 'detalles'
@@ -63,13 +66,14 @@ export class HomeComponent implements OnInit {
 
   crearSimulacion(): void {
     if (this.simulacionForm.invalid) return;
-
+  
     this.loading = true;
     this.apiService.runSimulacion(this.simulacionForm.value).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.resultadoSimulacion = res.body;
-
+        this.simulacionSeleccionada = res.body;
+  
         alert(
           `✅ Simulación generada exitosamente\n\n` +
           `Costo Total: ${res.body.costoTotal}\n` +
@@ -77,8 +81,20 @@ export class HomeComponent implements OnInit {
           `Espacio Disponible: ${res.body.espacioDisponible}\n` +
           `Pérdida: ${res.body.perdida}`
         );
-
+  
         this.loadRegistros();
+  
+        // 👇 Aquí está bien colocada la llamada
+        if (res.body.idSimulacion) {
+          this.apiService.getComprasByIdSimulador(res.body.idSimulacion).subscribe({
+            next: (resCompras: any) => {
+              this.comprasSimulacion = resCompras.body || [];
+              console.log('Compras de la simulación', this.comprasSimulacion);
+            },
+            error: (err) => console.error('Error cargando compras post-simulación', err)
+          });
+        }
+  
         console.log('Resultado completo:', res);
       },
       error: (err) => {
@@ -88,8 +104,32 @@ export class HomeComponent implements OnInit {
       }
     });
   }
-
+  
+  
   verDetalles(simulacion: any): void {
-    alert(`Detalles de simulación ID: ${simulacion.id}`);
+    this.simulacionSeleccionada = simulacion;
+    this.menusSimulacion = [];
+    this.recetasPorMenu = {};
+
+    this.apiService.getMenuByIdSimulacion(simulacion.id).subscribe({
+      next: (res: any) => {
+        this.menusSimulacion = res.body || [];
+        console.log('Menús de la simulación', this.menusSimulacion);
+
+        // 👇 Por cada menú, obtenemos sus recetas
+        this.menusSimulacion.forEach((menu) => {
+          this.apiService.getRecetaByIdMenu(menu.id).subscribe({
+            next: (resReceta: any) => {
+              this.recetasPorMenu[menu.id] = resReceta.body || [];
+            },
+            error: (err) => console.error(`Error obteniendo recetas del menú ${menu.id}`, err)
+          });
+        });
+      },
+      error: (err) => {
+        console.error('Error obteniendo menús', err);
+        alert('❌ Error al obtener los menús de la simulación');
+      }
+    });
   }
 }

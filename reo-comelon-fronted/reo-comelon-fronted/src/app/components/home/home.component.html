@@ -93,6 +93,115 @@
     </table>
   </mat-card-content>
 </mat-card>
+<!-- 🔽 Menús de la simulación -->
+<mat-card *ngIf="menusSimulacion.length > 0" style="margin-top:16px">
+  <mat-card-title>
+    🍽️ Menús de la Simulación ID: {{simulacionSeleccionada?.id}}
+  </mat-card-title>
+  <mat-card-content>
+    <table mat-table [dataSource]="menusSimulacion" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let m"> {{m.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipoPreso">
+        <th mat-header-cell *matHeaderCellDef> Tipo de Preso </th>
+        <td mat-cell *matCellDef="let m"> {{m.tipoPreso.tipoPreso}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef> Fecha </th>
+        <td mat-cell *matCellDef="let m"> {{m.fecha}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['id','tipoPreso','fecha']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id','tipoPreso','fecha'];"></tr>
+    </table>
+
+    <!-- 👇 NUEVO BLOQUE: recetas por menú -->
+    <div *ngFor="let menu of menusSimulacion" style="margin-top: 24px;">
+      <h4>📋 Recetas del Menú ID: {{menu.id}}</h4>
+
+      <table mat-table [dataSource]="recetasPorMenu[menu.id]" class="mat-elevation-z8" *ngIf="recetasPorMenu[menu.id] && recetasPorMenu[menu.id].length > 0"
+        >
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let r">{{r.id}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let r">{{r.nombre}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tipoReceta">
+          <th mat-header-cell *matHeaderCellDef> Tipo </th>
+          <td mat-cell *matCellDef="let r">{{r.tipoReceta?.tipo_receta}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="es_premium">
+          <th mat-header-cell *matHeaderCellDef> Premium </th>
+          <td mat-cell *matCellDef="let r">{{r.es_premium ? 'Sí' : 'No'}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['id','nombre','tipoReceta','es_premium']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['id','nombre','tipoReceta','es_premium'];"></tr>
+      </table>
+
+      <p *ngIf="!recetasPorMenu[menu.id]">Cargando recetas...</p>
+      <p *ngIf="recetasPorMenu[menu.id]?.length === 0">No hay recetas para este menú.</p>
+    </div>
+  </mat-card-content>
+</mat-card>
+<!-- 🔽 Compras registradas -->
+<mat-card *ngIf="comprasSimulacion.length > 0" style="margin-top:16px">
+  <mat-card-title>
+    🧾 Registro de Compras - Simulación ID: {{simulacionSeleccionada?.id}}
+  </mat-card-title>
+  <mat-card-content>
+    <table mat-table [dataSource]="comprasSimulacion" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let c">{{c.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ingrediente">
+        <th mat-header-cell *matHeaderCellDef> Ingrediente </th>
+        <td mat-cell *matCellDef="let c">{{c.cajaIngredientes.ingrediente.ingrediente}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="precio">
+        <th mat-header-cell *matHeaderCellDef> Precio Caja </th>
+        <td mat-cell *matCellDef="let c">{{c.cajaIngredientes.precio | currency:'GTQ'}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cantidad">
+        <th mat-header-cell *matHeaderCellDef> Nº Cajas </th>
+        <td mat-cell *matCellDef="let c">{{c.cantidad}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ocupacion">
+        <th mat-header-cell *matHeaderCellDef> Ocupación (m³/caja) </th>
+        <td mat-cell *matCellDef="let c">{{c.cajaIngredientes.ocupacionCaja.ocupacion}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaCompra">
+        <th mat-header-cell *matHeaderCellDef> Fecha Compra </th>
+        <td mat-cell *matCellDef="let c">{{c.fechaCompra | date}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaVencimiento">
+        <th mat-header-cell *matHeaderCellDef> Fecha Vencimiento </th>
+        <td mat-cell *matCellDef="let c">{{c.fechaVencimiento | date}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['id','ingrediente','precio','cantidad','ocupacion','fechaCompra','fechaVencimiento']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id','ingrediente','precio','cantidad','ocupacion','fechaCompra','fechaVencimiento'];"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
 
 <!-- 🔽 Resultado de la última simulación -->
 <mat-card *ngIf="resultadoSimulacion" style="margin-top:16px">
